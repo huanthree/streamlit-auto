@@ -1,13 +1,13 @@
 # Auto Renew streamlit
 
-自动续期 TickHosting 免费游戏机的脚本，使用 GitHub Actions 每96小时自动运行一次。
+自动续期streamlit的脚本，使用 GitHub Actions 每12小时自动运行一次。
 
 ## 功能特点
 
 - 自动点击streamlit运行
 - 自动点击续期按钮
 - 验证续期是否成功
-- 每96小时自动运行
+- 每12小时自动运行
 - telegram消息推送
 - 支持手动触发运行
 
