@@ -1,52 +1,38 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import NoSuchElementException
-from webdriver_manager.chrome import ChromeDriverManager
-import logging
+from selenium.common.exceptions import TimeoutException
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+# 配置浏览器选项
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")  # 无头模式（可选）
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
 
-def main():
-    url = "https://stream4lit-l89x9uaknyuyndksxqvatx.streamlit.app/"
-    button_text = "Yes, get this app back up!"
+# 初始化WebDriver（注意：需要下载对应版本的ChromeDriver）
+driver = webdriver.Chrome(options=options)
+
+try:
+    # 访问目标网页
+    driver.get("https://stream4lit-l89x9uaknyuyndksxqvatx.streamlit.app/")
+
+    # 设置显式等待（最多等待10秒）
+    wait = WebDriverWait(driver, 10)
     
-    options = Options()
-    options.add_argument("--headless=new")  # 更好的无头模式
-    options.add_argument("--disable-gpu")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    # 尝试查找按钮
+    button = wait.until(EC.element_to_be_clickable(
+        (By.XPATH, "//button[contains(., 'Yes, get this app back up!')]")
+    ))
     
-    logging.info("启动浏览器...")
-    driver = None  # 初始化driver为None
-    try:
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=options)
-        
-        logging.info(f"访问 {url} ...")
-        driver.get(url)
+    # 如果找到按钮则点击
+    button.click()
+    print("成功点击重启按钮")
 
-        # 等待按钮出现
-        try:
-            button = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.XPATH, f"//button[contains(text(), '{button_text}')]"))
-            )
-            logging.info("按钮已找到，点击中...")
-            button.click()
-            logging.info("按钮已点击。")
-        except NoSuchElementException:
-            logging.info("未找到按钮，可能已经在线。")
+except TimeoutException:
+    # 如果未找到按钮
+    print("成功：未找到需要点击的按钮")
 
-    except Exception as e:
-        logging.error(f"发生错误: {str(e)}")
-
-    finally:
-        if driver:  # 只有在driver初始化后才调用quit
-            driver.quit()
-        logging.info("浏览器已关闭。")
-
-if __name__ == "__main__":
-    main()
+finally:
+    # 关闭浏览器
+    driver.quit()
