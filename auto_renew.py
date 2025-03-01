@@ -21,6 +21,7 @@ def main():
     options.add_argument("--disable-dev-shm-usage")
     
     logging.info("启动浏览器...")
+    driver = None  # 初始化driver为None
     try:
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=options)
@@ -43,7 +44,8 @@ def main():
         logging.error(f"发生错误: {str(e)}")
 
     finally:
-        driver.quit()
+        if driver:  # 只有在driver初始化后才调用quit
+            driver.quit()
         logging.info("浏览器已关闭。")
 
 if __name__ == "__main__":
